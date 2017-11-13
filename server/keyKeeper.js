@@ -15,3 +15,4 @@ if(!devMode) {
 }
 
 exports.keys = keys;
+exports.devMode = devMode;
