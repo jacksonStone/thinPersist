@@ -1,6 +1,9 @@
 const { getHandler } = require('./trafficControl')
+const { keys } = require('./keyKeeper')
+const myKey = keys.myKey;
 //Because native ES6 is trash
 var Promise = require("bluebird")
+
 
 //This will formate a request object into a minimal form, and handle the flow of
 //control to controller handler methods
@@ -12,11 +15,17 @@ function root(req, res) {
 		method: method
 	}
 
+	const requestKey = req.headers['jasapi'];
+	if(requestKey !== myKey) {
+		res.writeHead(401);
+		return res.end('Hmm, try again?');
+	}
+
 	const handler = getHandler(formattedReq);
 
 	if(!handler) {
 		res.writeHead(404); 
-		res.end('Invalid Route');
+		return res.end('Invalid Route');
 	}
   let body = [];
 
@@ -31,11 +40,11 @@ function root(req, res) {
 				handlerRes = JSON.stringify(handlerRes);
 			}
 			res.writeHead(200);
-			res.write(handlerRes ||  "Consider it done!");
+			res.write(handlerRes ||  "Ok");
 			res.end();
 		})
 		.catch(err => {
-			res.writeHead(400); 
+			res.writeHead(400);
 			res.end(err.message);
 		});
 }
