@@ -2,17 +2,11 @@
 var Promise = require("bluebird")
 
 function initial(req){
-	let fullUrl = req.url;
-	let url = fullUrl;
-	let method = req.method.toLowerCase();
-	let parameters = {};
-	//Only use url parameters for a GET request!
-	//Don't muddy the waters
-	if(method === 'get') {
-		let parsedURL = parseURL(url);
-		url = parsedURL.url;
-		parameters = parsedURL.parameters;
-	}
+	const fullUrl = req.url;
+	const method = req.method.toLowerCase();
+	const parsedURL = parseURL(fullUrl);
+	const url = parsedURL.url;
+	const parameters = parsedURL.parameters;
 	console.log({url, parameters, method});
 	return {url, parameters, method};
 }

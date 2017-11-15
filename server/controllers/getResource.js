@@ -1,14 +1,24 @@
-const keyKeeper = require('../keyKeeper');
-const devMode = keyKeeper.devMode;
-const BUCKET_NAME = devMode ? 'thin-persist-dev' : 'thin-persist';
 const S3 = require('../AWS').S3;
 
 function getS3(formattedRequest) {
-	return BUCKET_NAME;
+	const params = formattedRequest.parameters;
+	if(!params) throw new Error('No "resource" parameter supplied');
+	const object = params.resource;
+	if(!object) throw new Error('No "resource" parameter supplied');
+	return S3.getObject(object).then(S3Obj => {
+		const response = {};
+		response.headers = {
+			'Content-Length' : S3Obj.contentLength,
+			'Content-Type' : S3Obj.contentType
+		};
+		response.body = S3Obj.body;
+		return response;
+	});
 }
 
 module.exports = {
 	url:'/get-resource',
 	method:'get',
-	handler: getS3
+	handler: getS3,
+	headers: true
 }

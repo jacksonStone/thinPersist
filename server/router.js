@@ -1,4 +1,4 @@
-const { getHandler } = require('./trafficControl')
+const { getController } = require('./trafficControl')
 const { format, verify } = require('./incomingRequests')
 
 //This connects 
@@ -10,18 +10,34 @@ var router = function(req, res) {
 	}
 
 	const formattedReq = format.initial(req);
-	const handler = getHandler(formattedReq);
-	if(!handler) {
+	const controller = getController(formattedReq);
+	if(!controller) {
 		res.writeHead(404); 
 		return res.end('Invalid Route');
 	}
+	let handleBody;
+	//We don't want to do default body data gathering
+	if(controller.streamBody) {
+		handleBody = controller.handler(formattedReq, req);
+	} 
+	else {
+		//Want whole body at once
+		handleBody = format.attachBody(req, formattedReq)
+			.then(()=>{
+				return controller.handler(formattedReq);
+			})
+	}
 
-  return format.attachBody(req, formattedReq)
-  	.then(() => {
-  		return handler(formattedReq); 
-  	})
+  return handleBody
   	.then(handlerRes => {
-			console.log(handlerRes);
+
+  		//If our handler needs to set headers
+  		if(controller.headers) {
+  			res.writeHead(200, handlerRes.headers);
+  			res.write(handlerRes.body || "Ok");
+  			return res.end();
+  		}
+
 			if(typeof handlerRes === 'object') {
 				handlerRes = JSON.stringify(handlerRes);
 			}
