@@ -13,6 +13,10 @@ function getS3(formattedRequest) {
 		};
 		response.body = S3Obj.body;
 		return response;
+	}).catch(e => {
+		response.body = 'Not found';
+		response.headers = {};
+		return response;
 	});
 }
 

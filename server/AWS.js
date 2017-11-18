@@ -18,7 +18,6 @@ const S3 = {
 		return new Promise((resolve, reject) => {
 			S3_SDK.getObject({ Bucket: BUCKET_NAME, Key: objectName}, (err, data) => {
 				if(err) {
-					console.log(err);
 					return reject(err);
 				}
 				return resolve({
