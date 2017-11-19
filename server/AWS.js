@@ -1,13 +1,13 @@
 const AWS = require('aws-sdk');
-const keyKeeper = require('./keyKeeper');
+const keyKeeper = require('keykeeper');
 const Promise = require("bluebird");
 const keys = keyKeeper.keys;
 const devMode = keyKeeper.devMode;
 const BUCKET_NAME = devMode ? 'thin-persist-dev' : 'thin-persist';
 
 AWS.config.credentials = {
-	accessKeyId:keys.awsClient,
-	secretAccessKey: keys.awsSecret,
+	accessKeyId:keys.awsclient,
+	secretAccessKey: keys.awssecret,
 	region: "us-east-1"
 };
 
